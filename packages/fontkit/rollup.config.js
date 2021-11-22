@@ -4,6 +4,8 @@ import ignore from 'rollup-plugin-ignore';
 import replace from 'rollup-plugin-replace';
 import { terser } from 'rollup-plugin-terser';
 import localResolve from 'rollup-plugin-local-resolve';
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
 import pkg from './package.json';
 
 const cjs = {
@@ -69,13 +71,28 @@ const browserConfig = Object.assign({}, configBase, {
     getESM({ file: 'lib/fontkit.browser.es.js' }),
     getCJS({ file: 'lib/fontkit.browser.cjs.js' }),
   ],
-  plugins: configBase.plugins.concat(
-    babel(babelConfig({ browser: true })),
+  external: configBase.external
+    .filter(dep => dep !== 'dfa')
+    .concat(
+      '@babel/runtime/regenerator',
+      '@babel/runtime/helpers/createClass',
+      '@babel/runtime/helpers/applyDecoratedDescriptor',
+      '@babel/runtime/helpers/defineProperty',
+      '@babel/runtime/helpers/inheritsLoose',
+    ),
+  plugins: [
+    ignore(['fs', 'brotli', 'brotli/decompress', './WOFF2Font']),
     replace({
       BROWSER: JSON.stringify(true),
     }),
-    ignore(['fs', 'brotli', 'brotli/decompress', './WOFF2Font']),
-  ),
+
+    json(),
+
+    resolve({ browser: true }),
+    commonjs({ include: /node_modules/ }),
+
+    babel(babelConfig({ browser: true })),
+  ],
 });
 
 const browserProdConfig = Object.assign({}, browserConfig, {
