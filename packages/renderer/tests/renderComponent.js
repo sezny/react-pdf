@@ -3,7 +3,7 @@
 
 import { Buffer } from 'buffer'
 import Canvas from 'canvas'
-import * as pdfjs from 'pdfjs-dist/legacy/build/pdf'
+import * as pdfjs from 'pdfjs-dist/build/pdf'
 
 import { renderToStream } from '..'
 
